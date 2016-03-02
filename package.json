@@ -1,0 +1,17 @@
+{
+  "name": "indiana-jones",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ast-types": "^0.8.15",
+    "istanbul": "^0.4.2",
+    "jscodeshift": "^0.3.13",
+    "recast": "^0.11.2"
+  }
+}
