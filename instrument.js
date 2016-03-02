@@ -16,7 +16,7 @@ var outputFilename = process.argv[3];
 var saneFileName = fileName.replace('/', '_');
 
 var source = fs.readFileSync(fileName, 'utf8');
-source = instrumenter.instrumentSync(source);
+source = instrumenter.instrumentSync(source, fileName);
 
 var postamble = `
 process.on('beforeExit', () => {
