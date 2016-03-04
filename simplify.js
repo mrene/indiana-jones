@@ -4,7 +4,8 @@ let recast = require('recast'),
 	fs = require('fs'),
 	types = require('ast-types'),
 	n = types.namedTypes,
-	b = types.builders;
+	b = types.builders,
+    _ = require('underscore');
 
 let fileName = process.argv[2];
 let coverageFileName = process.argv[3];
@@ -24,7 +25,7 @@ cov = cov[fileName];
 types.visit(ast, {
 
     visitExpressionStatement: forward,
-    visitBreakStatement: forward,
+    // visitBreakStatement: forward,
     visitContinueStatement: forward,
     visitDebuggerStatement: forward,
     visitReturnStatement: forward,
@@ -49,8 +50,8 @@ types.visit(ast, {
 
     	if (!this.isCovered(path)) {
     		
-    		console.log(path.node.type, path.node.loc);
-    		console.log('Would remove: ', recast.print(path.node).code);
+    		// console.log(path.node.type, path.node.loc);
+    		// console.log('Would remove: ', recast.print(path.node).code);
 
     		path.replace(b.emptyStatement());
 
@@ -96,7 +97,48 @@ types.visit(ast, {
      */
 });
 
+ast = recast.parse(recast.print(ast).code);
+
+
+types.visit(ast, {
+    // Remove empty block statements "{}"
+    visitBlockStatement: function(path) {
+        if (path.node.body.length === 0) {
+            path.parent.node[path.name] = null;
+            return false;
+        }
+
+        this.traverse(path);
+    }
+});
+
+
+
+types.visit(ast, {
+    // Simplify: Empty switch cases
+    visitSwitchStatement: function(path) {
+        var node = path.node;
+
+        // Go through all the cases; if a statement is found, skip, if a break is found without any statements, remove the case completely
+        for (var i = 0; i < node.cases.length; i++) {
+            var caseNode = node.cases[i];
+            if (caseNode.consequent.length !== 0 && caseNode.consequent[0].type !== 'BreakStatement') {
+                continue; /* Skip this one */
+            }
+
+            // Mark this statement for deletion
+            delete node.cases[i];
+        }
+
+        node.cases = _.compact(node.cases);
+
+        this.traverse(path);
+    }
+});
+
+
 var saneFileName = fileName.replace('/', '_');
 
 fs.writeFileSync(`clean-${saneFileName}.js`, recast.print(ast).code);
+
 
