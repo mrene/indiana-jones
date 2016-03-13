@@ -1,3 +1,4 @@
+#!/usr/local/bin/node
 'use strict';
 
 var istanbul = require('istanbul');
@@ -10,7 +11,7 @@ var instrumenter = new istanbul.Instrumenter({
 });
 
 
-var fileName = process.argv[2];
+var rootPath = process.argv[2];
 var outputFilename = process.argv[3];
 
 var saneFileName = fileName.replace('/', '_');
