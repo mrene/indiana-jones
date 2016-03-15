@@ -61,7 +61,7 @@ function _walk(dir, ignore, done) {
  * Modified version of this: http://stackoverflow.com/questions/5827612/node-js-fs-readdir-recursive-directory-search
  * @param  {string}   dir     The base director to start the walk from. Can be relative or absolute.
  * @param  {array}    ignore  An array of files or folders to ignore.
- * @param  {Function} done    The callback to call when the walk is finished. Recieves an array of file paths.
+ * @param  {function} done    The callback to call when the walk is finished. Recieves an array of file paths.
  */
 var walk = function(dir, ignore, done) {
   ignore = ignore || [];

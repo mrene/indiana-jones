@@ -1,29 +1,22 @@
-#!/usr/local/bin/node
 'use strict';
 
 var istanbul = require('istanbul');
 var fs = require('fs');
 
 
-var instrumenter = new istanbul.Instrumenter({
-	coverageVariable: '__coverage__',
-	preserveComments: true
-});
+function instrument(file, enc, out) {
+  var instrumenter = new istanbul.Instrumenter({
+    coverageVariable: `__coverage__`,
+    preserveComments: true
+  });
+
+  fs.readFile(file, 'utf8', function(err, content) {
+    source = instrumenter.instrumentSync(content, file);
+
+    fs.writeFileSync(out, source + `\n\n${postamble}`, 'utf8');
+  });
+}
 
 
-var rootPath = process.argv[2];
-var outputFilename = process.argv[3];
 
-var saneFileName = fileName.replace('/', '_');
-
-var source = fs.readFileSync(fileName, 'utf8');
-source = instrumenter.instrumentSync(source, fileName);
-
-var postamble = `
-process.on('beforeExit', () => {
-	require('fs').writeFileSync('coverage-${saneFileName}.json', JSON.stringify(__coverage__), 'utf8');
-});
-`;
-
-fs.writeFileSync(outputFilename, source + `\n\n${postamble}`, 'utf8');
-
+module.exports = instrument;
